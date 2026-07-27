@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/topic.dart';
 import '../../widgets/feature_card.dart';
+import '../lesson/lesson_list_screen.dart';
 
 class TopicDetailsScreen extends StatelessWidget {
 
@@ -82,7 +83,16 @@ class TopicDetailsScreen extends StatelessWidget {
               title: "Theory",
               subtitle: "${topic.theoryCount} Lessons",
               color: Colors.blue,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LessonListScreen(
+                      topic: topic,
+                    ),
+                  ),
+                );
+              },
             ),
 
             FeatureCard(
@@ -90,7 +100,16 @@ class TopicDetailsScreen extends StatelessWidget {
               title: "MCQ Practice",
               subtitle: "${topic.mcqCount} Questions",
               color: Colors.green,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LessonListScreen(
+                      topic: topic,
+                    ),
+                  ),
+                );
+              },
             ),
 
             FeatureCard(
@@ -98,7 +117,16 @@ class TopicDetailsScreen extends StatelessWidget {
               title: "Coding Practice",
               subtitle: "${topic.codingCount} Challenges",
               color: Colors.orange,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LessonListScreen(
+                      topic: topic,
+                    ),
+                  ),
+                );
+              },
             ),
 
             FeatureCard(
@@ -106,7 +134,16 @@ class TopicDetailsScreen extends StatelessWidget {
               title: "Final Quiz",
               subtitle: "Unlock after completion",
               color: Colors.purple,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LessonListScreen(
+                      topic: topic,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
