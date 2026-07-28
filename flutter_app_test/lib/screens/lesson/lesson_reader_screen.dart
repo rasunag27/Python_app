@@ -13,6 +13,125 @@ class LessonReaderScreen extends StatelessWidget {
     required this.lesson,
   });
 
+  List<String> _splitContent(String content) {
+  final normalized = content.trim();
+
+  if (normalized.isEmpty) {
+    return [];
+  }
+
+  // Only split when the lesson explicitly contains multiple examples.
+  if (normalized.contains('---EXAMPLE---')) {
+    return normalized
+        .split('---EXAMPLE---')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  // Otherwise treat the entire code block as one example.
+  return [normalized];
+}
+
+  int _countPrintStatements(String codeSection) {
+    return RegExp(r'\bprint\s*\(').allMatches(codeSection).length;
+  }
+
+  List<String> _buildOutputSections(
+    List<String> codeSections,
+    String output,
+) {
+  final outputs = _splitContent(output);
+
+  // Same number of examples and outputs.
+  if (outputs.length == codeSections.length) {
+    return outputs;
+  }
+
+  // Single example.
+  if (codeSections.length == 1) {
+    return [output.trim()];
+  }
+
+  // Multiple examples but fewer outputs.
+  return List.generate(
+    codeSections.length,
+    (index) => index < outputs.length ? outputs[index] : '',
+  );
+}
+
+  Widget _buildExampleSection({
+    required int index,
+    required String code,
+    required String output,
+  }) {
+    final showNumbering = code.contains(RegExp(r'\n\s*\n')) ||
+        output.contains(RegExp(r'\n\s*\n')) ||
+        index > 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          showNumbering ? 'Example ${index + 1}' : 'Example',
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SelectableText(
+              code,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 15,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          showNumbering ? 'Output ${index + 1}' : 'Output',
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.green.shade50,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SelectableText(
+              output,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 15,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,62 +186,45 @@ class LessonReaderScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            /// Code
-            const Text(
-              "💻 Example",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            /// Examples
+            ...() {
+              // New format using List<Example>
+              if (lesson.examples.isNotEmpty) {
+                return List.generate(
+                  lesson.examples.length,
+                  (index) => _buildExampleSection(
+                    index: index,
+                    code: lesson.examples[index].code,
+                    output: lesson.examples[index].output,
+                  ),
+                );
+              }
 
-            const SizedBox(height: 10),
+              // Old format (backward compatibility)
+              final codeSections = _splitContent(lesson.code);
+              final outputSections =
+                  _buildOutputSections(codeSections, lesson.output);
 
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                lesson.code,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 15,
-                ),
-              ),
-            ),
+              final sectionCount = codeSections.isNotEmpty
+                  ? codeSections.length
+                  : (outputSections.isNotEmpty ? outputSections.length : 1);
 
-            const SizedBox(height: 30),
+              return List.generate(sectionCount, (index) {
+                final code =
+                    codeSections.length > index ? codeSections[index] : '';
 
-            /// Output
-            const Text(
-              "✅ Output",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+                final output =
+                    outputSections.length > index ? outputSections[index] : '';
 
-            const SizedBox(height: 10),
+                return _buildExampleSection(
+                  index: index,
+                  code: code,
+                  output: output,
+                );
+              });
+            }(),
 
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                lesson.output,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             /// Real-world Example
             const Text(

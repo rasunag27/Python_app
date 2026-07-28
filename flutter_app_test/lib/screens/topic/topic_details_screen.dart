@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../models/topic.dart';
 import '../../widgets/feature_card.dart';
 import '../lesson/lesson_list_screen.dart';
+import '../common/placeholder_screen.dart';
+
 
 class TopicDetailsScreen extends StatelessWidget {
 
@@ -104,9 +106,9 @@ class TopicDetailsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LessonListScreen(
-                      topic: topic,
-                    ),
+                    builder: (_) => const PlaceholderScreen(
+                    title: "MCQ Practice",
+                  ),
                   ),
                 );
               },
@@ -121,9 +123,9 @@ class TopicDetailsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LessonListScreen(
-                      topic: topic,
-                    ),
+                    builder: (_) => const PlaceholderScreen(
+                    title: "Coding Practice",
+                  ),
                   ),
                 );
               },
@@ -138,9 +140,9 @@ class TopicDetailsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LessonListScreen(
-                      topic: topic,
-                    ),
+                    builder: (_) => const PlaceholderScreen(
+                    title: "Final Quiz",
+                  ),
                   ),
                 );
               },
